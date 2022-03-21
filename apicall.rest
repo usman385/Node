@@ -1,0 +1,11 @@
+
+
+POST http://localhost:5000/api/members
+
+{
+
+     "name":"Usman",
+    "age":23,
+    "email":"Usman@gmail.com",
+    "status":"active"
+}
