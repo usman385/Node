@@ -53,6 +53,7 @@ app.get('/',(req,res)=>{
 //calling from routes API FOLDER
 
 app.use('/api/members',require('./routers/api/members'))
+app.use('/api/UserSignUpController',require('./routers/api/UserSignUpController'))
 
 app.use(express.static(path.join(__dirname, "public")));
 
