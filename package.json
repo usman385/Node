@@ -16,6 +16,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.7",
     "mongoose-unique-validator": "^3.0.0",
+    "rfr": "^1.2.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
