@@ -1,11 +1,12 @@
 const rfr = require("rfr");
 const Member = rfr("/module/UserSignup");
+const jwt = require("jsonwebtoken");
 
 //SignUp
 
 exports.SignUp = async (req, res, next) => {
   console.log("jkasjkdsjk");
-  const { name, email, password } = req.body;
+  const { name, email, password, confirmpass } = req.body;
   let existingUser;
   try {
     existingUser = await Member.findOne({ email: email });
@@ -16,67 +17,65 @@ exports.SignUp = async (req, res, next) => {
   if (existingUser) {
     return res.status(422).json({ msg: "User Already SignUp" });
   }
-  console.log({ name, email, password });
+  console.log({ name, email, password, confirmpass });
   const AddUser = new Member({
     name,
     email,
     password,
+    confirmpass,
   });
 
   try {
     await AddUser.save();
     let token = jwt.sign(
-      { userId: AddUser.id, email: AddUser.email },
-      "dont-show-this",
-      { expiresIn: "1hr" }
+      { userId: AddUser._id, email: AddUser.email },
+      "dont-show-this"
     );
     return res.json({ msg: `SignUp SuccesFully`, name, token });
   } catch (err) {
     console.log(err);
+    res.json({
+      msg: "Signup failled due to some reasons",
+    });
   }
-  let token;
-  try {
-    token = jwt.sign(
-      { userId: AddUser.id, email: AddUser.email },
-      "dont-show-this",
-      { expiresIn: "1hr" }
-    );
-  } catch (error) {
-    return res.status(422).json({ msg: "User Already SignUp", error });
-  }
-  return res
-    .status(201)
-    .json({ userId: AddUser.id, email: AddUser.email, token: token });
 };
 
 //Login
 
 exports.Login = async (req, res, next) => {
-  const { email, password } = req.body;
-
-  let existingUser;
   try {
-    existingUser = await Member.findOne({ email: email });
-  } catch (error) {
-    res.status(400).json({ msg: "SignUp Failed", error });
+    const { email, password } = req.body;
+
+    let existingUser;
+    try {
+      existingUser = await Member.findOne({ email: email });
+      console.log("login user", existingUser);
+    } catch (error) {
+      return res.status(400).json({ msg: "SignUp Failed", error });
+    }
+    if (!existingUser || existingUser.password !== password) {
+      console.log("f3f3f4S");
+      return res.status(422).json({ msg: "Login Failled..." });
+    }
+    let token = jwt.sign(
+      {
+        userId: existingUser.id,
+      },
+      "dont-show-this"
+    );
+    res.status(201).json({
+      data: {
+        userId: existingUser.id,
+        email: existingUser.email,
+        token: token,
+      },
+      msg: `Login SuccesFully`,
+    });
+  } catch (err) {
+    console.log("err", err);
+    res.json({
+      msg: "Something Went wrong",
+    });
   }
-  if (!existingUser || existingUser.password !== password) {
-    return res.status(422).json({ msg: "Login Failled333" });
-  }
-  let token = jwt.sign(
-    {
-      userId: existingUser.id,
-      email: existingUser.email,
-      password: existingUser.password,
-    },
-    "dont-show-this",
-    { expiresIn: "1hr" }
-  );
-  res.status(201).json({
-    userId: existingUser.id,
-    email: existingUser.email,
-    password: existingUser.password,
-    token: token,
-  });
-  return res.json({ msg: `Login SuccesFully` });
+  // return res.json();
 };

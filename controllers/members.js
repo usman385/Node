@@ -4,7 +4,8 @@ const User = rfr("/module/users");
 
 //GET USER BY ID
 exports.getMemberById = async (req, res) => {
-  console.log("sdsdfsdf");
+  console.log("sd...........sdfsdf");
+
   const userId = req.params.id;
   let userbyid;
   try {
@@ -28,14 +29,14 @@ exports.getMembers = async (req, res) => {
   } catch (err) {
     console.log("get data error", err);
   }
-
-  res.json(members);
 };
 
 //POST DATA
 
 exports.postMembers = async (req, res, next) => {
   const { name, age, email, status } = req.body;
+  const tempImage = req.file;
+  console.log("tempImage", tempImage);
   // const newMember = {
   //     id:uuid.v4(),bo
   //     name:req.body.name,
@@ -45,12 +46,14 @@ exports.postMembers = async (req, res, next) => {
 
   // }
   //Post the data into database
-  console.log({ name, email, age, status });
+  const image = `./uploads/${tempImage.filename}`;
+  console.log({ name, email, age, status, image });
   const addMember = new User({
     name,
     age,
     email,
     status,
+    image,
   });
 
   if (
@@ -71,23 +74,38 @@ exports.postMembers = async (req, res, next) => {
   }
 };
 
+
+
 //Update data from database
 
 exports.updatwMembers = async (req, res) => {
   console.log("update function calling");
-  const updatebyid = req.params.id;
-  console.log("id", updatebyid);
+  const userId = req.params.id;
+  console.log("id", userId);
+  console.log("req.body: ", req.body);
   const { name, age, email, status } = req.body;
   let user;
+
+  console.log("name, age, email, status", name, age, email, status);
+
   try {
-    user = await User.findById(updatebyid);
+    user = await User.findById(userId);
   } catch (err) {
     console.log("validation", err);
   }
+
+  if (!user) {
+    return res.json({ msg: `User not found` });
+  }
+
   user.name = name;
   user.age = age;
   user.email = email;
   user.status = status;
+
+  if (req?.file?.filename) {
+    user.image = `./uploads/${req.file.filename}`;
+  }
 
   try {
     await user.save();
