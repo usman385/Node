@@ -2,9 +2,21 @@ const rfr = require("rfr");
 const { Router } = require("express");
 const express = require("express");
 const routes = express.Router();
-const uuid = require("uuid");
-const members = rfr("/Members");
-const { findById } = rfr("/module/users");
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, "./uploads/");
+  },
+  filename: function (req, file, callback) {
+    callback(
+      null,
+      new Date().toISOString().replace(/:/g, " ") + "-" + file.originalname
+    );
+  },
+});
+const upload = multer({ storage: storage });
 
 const User = rfr("/module/users");
 const memberController = rfr("/controllers/members");
@@ -33,7 +45,9 @@ routes.get("/", memberController.getMembers);
 
 //create a member using post method members
 
-routes.post("/", memberController.postMembers);
+routes.post("/", upload.single("image"), memberController.postMembers);
+
+// routes.post("/post_name", memberController.postname);
 
 //update member
 
@@ -59,7 +73,7 @@ routes.post("/", memberController.postMembers);
 
 //--------------------------********update from database*****----------------------------------------
 
-routes.put("/:id", memberController.updatwMembers);
+routes.put("/:id", upload.single("image"), memberController.updatwMembers);
 
 //--------------------------********///////*****----------------------------------------
 //deleted member
