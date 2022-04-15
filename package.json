@@ -18,6 +18,7 @@
     "mongoose": "^6.2.7",
     "mongoose-unique-validator": "^3.0.0",
     "multer": "^1.4.4",
+    "nodemailer": "^6.7.3",
     "rfr": "^1.2.3",
     "uuid": "^8.3.2"
   },

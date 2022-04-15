@@ -1,11 +1,12 @@
 const express = require("express");
-const req = require("express/lib/request");
 const path = require("path");
 const exphbs = require("express-handlebars");
 const Logger = require("./middleware/logger");
 const mongoose = require("mongoose");
-const members = require("./Members");
-var cors = require("cors");
+const cors = require("cors");
+dotEnv = require("dotenv");
+
+dotEnv.config();
 
 const app = express();
 
@@ -19,21 +20,18 @@ app.set("view engine", "handlebars");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// app.use(Logger());
+
 app.use(cors());
 
-app.use("/api/members", require("./routers/api/members"));
+app.use("/api", require("./routes"));
 
-app.use(
-  "/api/UserSignUpController",
-  require("./routers/api/UserSignUpController")
-);
+// app.use("/api/authRoute", require("./routes/auth.route"));
 
 app.use("/uploads/", express.static(path.join(__dirname, "uploads")));
 
 mongoose
-  .connect(
-    "mongodb+srv://usman385:11235116@cluster0.dkeb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-  )
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     const PORT = process.env.PORT || 5000;
 
