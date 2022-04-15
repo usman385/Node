@@ -18,8 +18,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-const User = rfr("/module/users");
-const memberController = rfr("/controllers/members");
+const User = rfr("/models/user");
+const memberController = rfr("/controllers/member.controller.js");
 
 //get single member from array
 
@@ -36,16 +36,16 @@ const memberController = rfr("/controllers/members");
 
 //get single user from data base
 
-routes.get("/:id", memberController.getMemberById);
+routes.get("/member/:id", memberController.getMemberById);
 
 //--------------------------*******************----------------------------------
 
 //get all members from array
-routes.get("/", memberController.getMembers);
+routes.get("/member", memberController.getMembers);
 
 //create a member using post method members
 
-routes.post("/", upload.single("image"), memberController.postMembers);
+routes.post("/member", upload.single("image"), memberController.postMembers);
 
 // routes.post("/post_name", memberController.postname);
 
@@ -73,7 +73,11 @@ routes.post("/", upload.single("image"), memberController.postMembers);
 
 //--------------------------********update from database*****----------------------------------------
 
-routes.put("/:id", upload.single("image"), memberController.updatwMembers);
+routes.put(
+  "/member/:id",
+  upload.single("image"),
+  memberController.updateMembers
+);
 
 //--------------------------********///////*****----------------------------------------
 //deleted member
@@ -92,6 +96,6 @@ routes.put("/:id", upload.single("image"), memberController.updatwMembers);
 // });
 //--------------------------********Delete from Database*****----------------------------------------
 
-routes.delete("/:id", memberController.deleteMember);
+routes.delete("/member/:id", memberController.deleteMember);
 
 module.exports = routes;

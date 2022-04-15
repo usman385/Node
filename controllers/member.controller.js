@@ -1,30 +1,25 @@
 const rfr = require("rfr");
 
-const User = rfr("/module/users");
+const { User } = rfr("/models");
 
 //GET USER BY ID
 exports.getMemberById = async (req, res) => {
-  console.log("sd...........sdfsdf");
-
   const userId = req.params.id;
-  let userbyid;
+  let userById;
   try {
-    userbyid = await User.findById(userId);
-    return res.json(userbyid);
+    userById = await User.findById(userId);
+    return res.json(userById);
   } catch (err) {
     console.log("get by id error", err);
   }
 };
 
-//GET USERS
+//GET All USERS
 
 exports.getMembers = async (req, res) => {
-  //geting data from array
-  // const members = await members.find();
-
-  //Get data from Database
   try {
-    const users = await User.find();
+    const mysort = { name: 1 };
+    const users = await User.find().sort(mysort);
     res.json(users);
   } catch (err) {
     console.log("get data error", err);
@@ -36,18 +31,9 @@ exports.getMembers = async (req, res) => {
 exports.postMembers = async (req, res, next) => {
   const { name, age, email, status } = req.body;
   const tempImage = req.file;
-  console.log("tempImage", tempImage);
-  // const newMember = {
-  //     id:uuid.v4(),bo
-  //     name:req.body.name,
-  //     email:req.body.email,
-  //     age:req.body.age,
-  //     status:'active',
 
-  // }
-  //Post the data into database
   const image = `./uploads/${tempImage.filename}`;
-  console.log({ name, email, age, status, image });
+
   const addMember = new User({
     name,
     age,
@@ -64,34 +50,27 @@ exports.postMembers = async (req, res, next) => {
   ) {
     return res.status(400).json({ msg: "Please enter the name email and age" });
   } else {
-    // members.push(newMember)
-    // res.json(members)
     try {
       await addMember.save();
+      return res.status(400).json({ msg: "sucessfully" });
     } catch (err) {
       console.log(err);
     }
   }
 };
 
-
-
 //Update data from database
 
-exports.updatwMembers = async (req, res) => {
-  console.log("update function calling");
+exports.updateMembers = async (req, res) => {
   const userId = req.params.id;
-  console.log("id", userId);
-  console.log("req.body: ", req.body);
+
   const { name, age, email, status } = req.body;
   let user;
-
-  console.log("name, age, email, status", name, age, email, status);
 
   try {
     user = await User.findById(userId);
   } catch (err) {
-    console.log("validation", err);
+    res.json({ msg: "User not found", err });
   }
 
   if (!user) {
